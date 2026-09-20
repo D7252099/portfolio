@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShangEn Den | Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+        }
+        /* 首屏鼠标跟随图片 */
+        .mouse-follow-img {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease, transform 0.12s ease-out;
+            width: 280px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 0;
+        }
+        .mouse-follow-img.active {
+            opacity: 0.72;
+        }
+        /* 瀑布流 - 极窄间隙 column-gap:12px */
+        .masonry {
+            column-count: 3;
+            column-gap: 12px;
+        }
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 12px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            /* 入场动画初始状态 */
+            opacity: 0;
+            transform: translateY(36px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .masonry-item.in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .masonry-item img {
+            width: 100%;
+            display: block;
+            border-radius: 0;
+            transition: transform 0.4s ease;
+        }
+        .masonry-item:hover img {
+            transform: scale(1.04);
+        }
+        .item-overlay {
+            position: absolute;
+            inset:0;
+            background:rgba(0,0,0,0.45);
+            display:flex;
+            align-items:flex-end;
+            padding:24px;
+            opacity:0;
+            transition: opacity 0.3s ease;
+        }
+        .masonry-item:hover .item-overlay {
+            opacity:1;
+        }
+        /* 草绿色 */
+        .text-grass {
+            color: #73d160;
+        }
+        /* 项目详情弹窗 */
+        .project-modal {
+            position: fixed;
+            inset:0;
+            background:#000;
+            z-index:99;
+            overflow-y:auto;
+            padding:4vw;
+            display:none;
+        }
+        .project-modal.open {
+            display:block;
+        }
+        /* 移动端汉堡菜单 */
+        .mobile-menu {
+            position:fixed;
+            inset:0;
+            background:#000;
+            z-index:98;
+            display:none;
+            flex-direction:column;
+            justify-content:center;
+            padding:4vw;
+        }
+        .mobile-menu.open {
+            display:flex;
+        }
+        @media(max-width:1024px){
+            .masonry{column-count:2;}
+            .mouse-follow-img{width:220px;height:140px;}
+        }
+        @media(max-width:640px){
+            .masonry{column-count:1;}
+            .mouse-follow-img{width:180px;height:120px;}
+        }
+    </style>
+</head>
+<body>
+<!-- 导航栏 -->
+<header class="fixed top-0 left-0 w-full z-50 mix-blend-difference">
+    <div class="flex justify-between items-center px-[4vw] py-5">
+        <a href="#hero" class="text-xl font-bold tracking-tighter">S·D®</a>
+        <!-- PC导航 -->
+        <nav class="hidden md:flex gap-10">
+            <a href="#hero" class="hover:text-grass transition-colors">Index</a>
+            <a href="#works" class="hover:text-grass transition-colors">Works</a>
+            <a href="#about" class="hover:text-grass transition-colors">About</a>
+            <a href="#contact" class="hover:text-grass transition-colors">Contact</a>
+        </nav>
+        <!-- 汉堡按钮 -->
+        <button id="menuBtn" class="md:hidden text-xl">☰</button>
+    </div>
+</header>
+<!-- 移动端全屏菜单 -->
+<div class="mobile-menu" id="mobileMenu">
+    <button id="closeMenu" class="absolute top-5 right-[4vw] text-xl">✕</button>
+    <nav class="flex flex-col gap-8 text-4xl font-semibold">
+        <a href="#hero" class="mobile-link hover:text-grass">Index</a>
+        <a href="#works" class="mobile-link hover:text-grass">Works</a>
+        <a href="#about" class="mobile-link hover:text-grass">About</a>
+        <a href="#contact" class="mobile-link hover:text-grass">Contact</a>
+    </nav>
+</div>
+
+<!-- 首屏Hero -->
+<section id="hero" class="relative w-full h-screen overflow-hidden">
+    <img class="mouse-follow-img" src="https://picsum.photos/id/237/600/400" alt="work01">
+    <img class="mouse-follow-img" src="https://picsum.photos/id/240/600/400" alt="work02">
+    <img class="mouse-follow-img" src="https://picsum.photos/id/242/600/400" alt="work03">
+    <img class="mouse-follow-img" src="https://picsum.photos/id/245/600/400" alt="work04">
+    <img class="mouse-follow-img" src="https://picsum.photos/id/248/600/400" alt="work05">
+
+    <div class="absolute right-[4vw] top-1/2 -translate-y-1/2 max-w-xl">
+        <h1 class="text-[clamp(3rem,10vw,7rem)] font-extrabold leading-none tracking-tighter">
+            ShangEn Den
+        </h1>
+        <p class="text-grass mt-6 text-lg md:text-xl font-light max-w-md leading-relaxed">
+            新媒体内容创作者，擅长短视频剪辑、节奏叙事、氛围感调色。
+            专注于打造高传播力的视觉内容，兼顾故事表达与平台流量逻辑，
+            擅长拆解热点，用镜头语言传递情绪，产出质感高级的短视频作品。
+        </p>
+        <div class="mt-12 opacity-60 text-sm">
+            ↓ Scroll to view projects
+        </div>
+    </div>
+</section>
+
+<!-- 作品瀑布流区域 -->
+<section id="works" class="px-[4vw] py-24">
+    <h2 class="text-3xl font-semibold mb-12">Selected Works</h2>
+    <div class="masonry" id="masonryWrap">
+        <div class="masonry-item" data-index="0">
+            <img src="https://picsum.photos/id/1011/800/1200" alt="project">
+            <div class="item-overlay">
+                <div>
+                    <div class="text-grass text-sm">01</div>
+                    <h3 class="text-2xl font-semibold">短视频品牌宣传</h3>
+                </div>
+            </div>
+        </div>
+        <div class="masonry-item" data-index="1">
+            <img src="https://picsum.photos/id/1025/800/700" alt="project">
+            <div class="item-overlay">
+                <div>
+                    <div class="text-grass text-sm">02</div>
+                    <h3 class="text-2xl font-semibold">热点剧情短片</h3>
+                </div>
+            </div>
+        </div>
+        <div class="masonry-item" data-index="2">
+            <img src="https://picsum.photos/id/1035/800/950" alt="project">
+            <div class="item-overlay">
+                <div>
+                    <div class="text-grass text-sm">03</div>
+                    <h3 class="text-2xl font-semibold">账号IP视觉包装</h3>
+                </div>
+            </div>
+        </div>
+        <div class="masonry-item" data-index="3">
+            <img src="https://picsum.photos/id/1040/800/600" alt="project">
+            <div class="item-overlay">
+                <div>
+                    <div class="text-grass text-sm">04</div>
+                    <h3 class="text-2xl font-semibold">产品种草剪辑</h3>
+                </div>
+            </div>
+        </div>
+        <div class="masonry-item" data-index="4">
+            <img src="https://picsum.photos/id/1060/800/1100" alt="project">
+            <div class="item-overlay">
+                <div>
+                    <div class="text-grass text-sm">05</div>
+                    <h3 class="text-2xl font-semibold">直播高光切片</h3>
+                </div>
+            </div>
+        </div>
+        <div class="masonry-item" data-index="5">
+            <img src="https://picsum.photos/id/1068/800/750" alt="project">
+            <div class="item-overlay">
+                <div>
+                    <div class="text-grass text-sm">06</div>
+                    <h3 class="text-2xl font-semibold">城市氛围感短片</h3>
+                </div>
+            </div>
+        </div>
+        <div class="masonry-item" data-index="6">
+            <img src="https://picsum.photos/id/1080/800/1000" alt="project">
+            <div class="item-overlay">
+                <div>
+                    <div class="text-grass text-sm">07</div>
+                    <h3 class="text-2xl font-semibold">人物纪实短视频</h3>
+                </div>
+            </div>
+        </div>
+        <div class="masonry-item" data-index="7">
+            <img src="https://picsum.photos/id/1083/800/680" alt="project">
+            <div class="item-overlay">
+                <div>
+                    <div class="text-grass text-sm">08</div>
+                    <h3 class="text-2xl font-semibold">节日营销短片</h3>
+                </div>
+            </div>
+        </div>
+        <div class="masonry-item" data-index="8">
+            <img src="https://picsum.photos/id/1092/800/880" alt="project">
+            <div class="item-overlay">
+                <div>
+                    <div class="text-grass text-sm">09</div>
+                    <h3 class="text-2xl font-semibold">探店短视频系列</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About -->
+<section id="about" class="px-[4vw] py-24">
+    <div class="max-w-3xl">
+        <h2 class="text-3xl font-semibold mb-8">About</h2>
+        <p class="text-gray-300 text-lg leading-relaxed">
+            深耕新媒体短视频创作，擅长全链路短视频制作：脚本策划、实拍指导、剪辑包装、调色、字幕设计。
+            熟悉抖音、小红书、B站等平台流量规则，可独立完成账号内容策划与视觉风格搭建，擅长抓情绪节奏，打造高完播作品。
+        </p>
+    </div>
+</section>
+
+<!-- Contact -->
+<section id="contact" class="px-[4vw] py-24">
+    <h2 class="text-[clamp(2.5rem,6vw,4.5rem)] font-bold leading-tight">Let's Talk</h2>
+    <div class="mt-10 space-y-5 text-xl text-gray-300">
+        <p>Email：hello@shangen.den</p>
+        <p>Douyin：@ShangEnDen</p>
+        <p>Xiaohongshu：@ShangEnDen</p>
+        <p>Bilibili：@ShangEnDen</p>
+    </div>
+</section>
+
+<!-- 项目详情弹窗 -->
+<div class="project-modal" id="projectModal">
+    <button id="closeModal" class="absolute top-5 right-[4vw] text-2xl">✕</button>
+    <div id="modalContent">
+    </div>
+</div>
+
+<script>
+// 项目数据
+const projectList = [
+    {title:"短视频品牌宣传",desc:"为品牌打造系列短视频宣传片，统一视觉调性，兼顾品牌质感与短视频平台传播逻辑，大幅提升品牌曝光。",tag:"品牌短视频",year:"2026",platform:"抖音 / 小红书"},
+    {title:"热点剧情短片",desc:"紧跟平台热点策划剧情脚本，强情绪开头，紧凑剪辑节奏，多条视频获得百万播放。",tag:"剧情短片",year:"2026",platform:"抖音"},
+    {title:"账号IP视觉包装",desc:"全套IP账号视觉体系，片头片尾、转场、调色定调，统一账号整体风格。",tag:"IP包装",year:"2025",platform:"全平台"},
+    {title:"产品种草剪辑",desc:"产品种草短视频，突出产品卖点，氛围感调色，提升转化点击率。",tag:"种草短视频",year:"2025",platform:"小红书"},
+    {title:"直播高光切片",desc:"直播回放二次剪辑切片，提取高光片段快速产出短视频素材。",tag:"直播切片",year:"2025",platform:"抖音"},
+    {title:"城市氛围感短片",desc:"城市风光短片，电影感调色，慢节奏叙事，适合城市文旅宣传。",tag:"文旅短片",year:"2025",platform:"B站"},
+    {title:"人物纪实短视频",desc:"人物纪实向短视频，捕捉真实情绪，叙事温柔有力量。",tag:"纪实短片",year:"2026",platform:"小红书"},
+    {title:"节日营销短片",desc:"节日节点营销短视频，适配平台节日流量活动，氛围感强。",tag:"营销短片",year:"2025",platform:"抖音"},
+    {title:"探店短视频系列",desc:"探店短视频栏目，固定剪辑模板，稳定批量产出内容。",tag:"探店系列",year:"2026",platform:"抖音/小红书"},
+];
+
+// 首屏鼠标跟随图片动画
+const hero = document.getElementById('hero');
+const images = Array.from(document.querySelectorAll('.mouse-follow-img'));
+let currentIndex = 0;
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+
+hero.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    const ratio = e.clientX / window.innerWidth;
+    const nextIdx = Math.min(Math.floor(ratio * images.length), images.length -1);
+    if(nextIdx !== currentIndex){
+        images[currentIndex].classList.remove('active');
+        currentIndex = nextIdx;
+    }
+})
+
+function animate(){
+    const img = images[currentIndex];
+    img.style.left = `${mouseX}px`;
+    img.style.top = `${mouseY}px`;
+    img.style.transform = 'translate(-50%,-50%)';
+    img.classList.add('active');
+    requestAnimationFrame(animate);
+}
+animate();
+
+// 移动端汉堡菜单
+const menuBtn = document.getElementById('menuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+const closeMenu = document.getElementById('closeMenu');
+const mobileLinks = document.querySelectorAll('.mobile-link');
+menuBtn.onclick = ()=> mobileMenu.classList.add('open');
+closeMenu.onclick = ()=> mobileMenu.classList.remove('open');
+mobileLinks.forEach(link=>{
+    link.onclick = ()=> mobileMenu.classList.remove('open');
+})
+
+// 项目弹窗
+const modal = document.getElementById('projectModal');
+const modalContent = document.getElementById('modalContent');
+const closeModalBtn = document.getElementById('closeModal');
+const items = document.querySelectorAll('.masonry-item');
+let activeProjIndex = 0;
+
+function renderProject(idx){
+    const p = projectList[idx];
+    modalContent.innerHTML = `
+        <div class="grid md:grid-cols-2 gap-12">
+            <div>
+                <img src="https://picsum.photos/id/${1010+idx}/1200/1600" alt="${p.title}" class="w-full">
+            </div>
+            <div>
+                <div class="text-grass">0${idx+1}</div>
+                <h2 class="text-4xl font-bold mt-2">${p.title}</h2>
+                <div class="mt-6 space-y-3 text-gray-400">
+                    <p>类别：${p.tag}</p>
+                    <p>平台：${p.platform}</p>
+                    <p>年份：${p.year}</p>
+                </div>
+                <p class="mt-8 text-gray-200 text-lg leading-relaxed">${p.desc}</p>
+                <div class="mt-12 flex gap-6">
+                    <button id="prevBtn" class="px-6 py-2 border border-white hover:bg-white hover:text-black transition">← Prev</button>
+                    <button id="nextBtn" class="px-6 py-2 border border-white hover:bg-white hover:text-black transition">Next →</button>
+                </div>
+            </div>
+        </div>
+    `
+    // 上一个下一个
+    document.getElementById('prevBtn').onclick = ()=>{
+        const newI = idx === 0 ? projectList.length - 1 : idx - 1;
+        renderProject(newI);
+    }
+    document.getElementById('nextBtn').onclick = ()=>{
+        const newI = idx === projectList.length -1 ? 0 : idx + 1;
+        renderProject(newI);
+    }
+}
+
+items.forEach(item=>{
+    item.addEventListener('click',()=>{
+        const i = Number(item.dataset.index);
+        activeProjIndex = i;
+        renderProject(i);
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    })
+})
+closeModalBtn.onclick = ()=>{
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+}
+// ESC关闭弹窗
+document.addEventListener('keydown',e=>{
+    if(e.key === 'Escape') modal.classList.remove('open');
+})
+
+// ========== 瀑布流视口滚动动画核心逻辑 ==========
+const masonryItems = document.querySelectorAll('.masonry-item');
+let lastScrollY = window.scrollY;
+
+const observer = new IntersectionObserver((entries)=>{
+    // 判断滚动方向
+    const isScrollDown = window.scrollY > lastScrollY;
+    lastScrollY = window.scrollY;
+
+    entries.forEach(entry=>{
+        if(entry.isIntersecting){
+            // 进入视口
+            entry.target.classList.add('in-view');
+        }else{
+            // 完全离开视口，重置动画
+            entry.target.classList.remove('in-view');
+        }
+    })
+
+    // 向下滚动：从上到下顺序入场；向上滚动：反向从下到上
+    const visibleItems = Array.from(masonryItems).filter(el=>{
+        const rect = el.getBoundingClientRect();
+        return rect.top < window.innerHeight && rect.bottom > 0;
+    })
+    visibleItems.sort((a,b)=>{
+        const aTop = a.getBoundingClientRect().top;
+        const bTop = b.getBoundingClientRect().top;
+        return isScrollDown ? aTop - bTop : bTop - aTop;
+    })
+    visibleItems.forEach((el,idx)=>{
+        el.style.transitionDelay = `${idx * 0.12}s`;
+    })
+
+},{ threshold:0.15 })
+
+masonryItems.forEach(el=> observer.observe(el));
+</script>
+</body>
+</html>
